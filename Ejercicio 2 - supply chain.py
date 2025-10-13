@@ -7,7 +7,7 @@ Created on Sun Oct 12 19:50:08 2025
 
 from pulp import *
 
-model = Lpproblem("Simulacro2", LpMinimize)
+model = LpProblem("Simulacro2", LpMinimize)
 
 #Datos
 
@@ -25,9 +25,9 @@ demanda = {"C1": 30, "C2": 40}
 
 #Variables
 
-z = LpVariable.dicts("z", A, lowBound = 0, cat="Binary")
+z = LpVariable.dicts("z", A, lowBound = 0, upBound=1, cat="Binary")
 
-x = LpVariable.dicts("x", [(c1, c2) for c1 in A for c2 in C], lowBound = 0, cat="Integer")
+x = LpVariable.dicts("x", [x(c1, c2) for c1 in A for c2 in C], lowBound = 0, cat="Integer")
 
 
 #Función objetivo
@@ -36,4 +36,11 @@ model += lpSum(costes_fijos(c1)*z(c1) for c1 in A) + lpSum(costes_unit[(c2,c3)]*
 
 
 #Restricciones
+for c in C:
+    model += lpSum(x[(c1,c)] for c1 in A) >= demanda[c]
 
+for a in A:
+    model += lpSum(x[(a, c2)] for c2 in C) <= costes_fijos[a]
+
+
+model.solve()
