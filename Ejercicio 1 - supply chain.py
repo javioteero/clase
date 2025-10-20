@@ -59,3 +59,110 @@ for n in F:
 model.solve()
 
 print(lp.LpStatus[model.status])
+
+
+
+#%% V2
+
+
+import pulp as lp
+
+model = lp.LpProblem("V2", lp.LpMinimize)
+
+
+F = ["F1","F2","F3"]
+M = ["M1","M2"]
+
+coste_unit = {("F1","M1"):2,("F1","M2"):3,("F2","M1"):1,("F2","M2"):1,("F3","M1"):4,("F3","M2"):2}
+
+C = 100
+
+L = {"F1":30,"F2":20,"F3":30}
+
+D = {"M1":40,"M2":30}
+
+
+#Variables
+
+x = lp.LpVariable.dicts("x", coste_unit, lowBound=0,cat="Integer")
+
+P = lp.LpVariable("P", lowBound=0, cat="Integer")
+
+#Función objetivo
+
+model += lp.lpSum(coste_unit[(i,j)] * x[(i,j)] for i in F for j in M)
+
+#Restricciones
+
+P = lp.lpSum(x[(i,j)] for i in F for j in M)
+
+model += P <= C
+
+for i in F:
+    model += lp.lpSum(x[(i,j)] for j in M) <= L[i]
+    
+for j in M:
+    model += lp.lpSum(x[(i,j)] for i in F) >= D[j]
+
+
+#Resolver
+
+model.solve()
+
+print("\nEstado del problema: ", lp.LpStatus[model.status])
+
+print("\nValor de las variables: ")
+for v in model.variables():
+    print(v.name," = ", v.value())
+print("\nValor de la función objetivo: ", lp.value(model.objective))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
