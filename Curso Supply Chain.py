@@ -358,6 +358,66 @@ for v in model.variables():
 print("\nValor de la función objetivo: ", lp.value(model.objective))
 
 
+#%% Contraint combination exercise
+
+
+import pulp as lp
+
+model = lp.LpProblem("contraintcomb", lp.LpMinimize)
+
+
+W = ["W1","W2"]
+P =["A", "B", "C"]
+C = ["C1", "C2", "C3", "C4"]
+
+
+#W1 is small and can either ship 10 products A
+#per a week or 15 products B per a week or 20
+#products C per a week.
+
+
+demanda = {("A","C1"):10,("A","C2"):8,("A","C3"):28,("A","C4"):0,("B","C1"):17,("B","C2"):11,("B","C3"):10,("B","C4"):6,("C","C1"):23,("C","C2"):20,("C","C3"):25,("C","C4"):13}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
