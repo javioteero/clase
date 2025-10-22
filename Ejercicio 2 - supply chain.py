@@ -132,6 +132,69 @@ print("\n Función objetivo", lp.value(model.objective))
 
 
 
+#%% V3
+
+import pulp as lp
+
+
+model = lp.LpProblem("V3", lp.LpMinimize)
+
+A = ["A1", "A2", "A3"]
+C = ["C1", "C2"]
+
+F = {"A1": 100, "A2": 80, "A3": 90}
+
+Cap = {"A1": 50, "A2": 50, "A3": 40}
+
+S = {("A1","C1"): 3,("A1","C2"): 2,("A2","C1"): 1,("A2","C2"): 3,("A3","C1"): 2,("A3","C2"): 2}
+
+D = {"C1":30, "C2":40}
+
+
+#Variables
+
+z = lp.LpVariable.dicts("z", F, lowBound=0, upBound=1, cat="Binary")
+
+x = lp.LpVariable.dicts("x", S, lowBound=0, cat= "Integer")
+
+
+#Restricciones
+
+for j in C:
+    model += lp.lpSum(x[(i,j)] for i in A) >= D[j]
+    
+for i in A:
+    model += lp.lpSum(x[(i,j)] for j in C) <= Cap[i] * z[i]
+
+#Función objetivo
+
+model += lp.lpSum(F[i]*z[i] for i in A) + lp.lpSum(S[(i,j)] * x[(i,j)] for i in A for j in C)
+
+
+#Resolver
+
+model.solve()
+
+print("\n Estado del problema: ", lp.LpStatus[model.status])
+
+print("\n Variables: ")
+
+for v in model.variables():
+    print(v.name, " = ", v.value())
+    
+print("Función objetivo: ", lp.value(model.objective))
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
