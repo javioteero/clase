@@ -129,7 +129,7 @@ for i in cust:
 
 import pulp as lp
 
-model = lp.LpProblem("Bakery", sense = lp.LpMaximize)
+model = lp.LpProblem("Bakery", lp.LpMaximize)
 
 num_oven = 1
 num_bakers = 2
