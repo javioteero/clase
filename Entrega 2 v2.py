@@ -9,7 +9,7 @@ import pulp as lp
 
 #PROBLEMA
 
-model = lp.LpProblem("Entrega2", lp.LpMinimize)
+model = lp.LpProblem("Entrega2 Ej1", lp.LpMinimize)
 
 #DATOS
 
@@ -37,23 +37,64 @@ End = {"P1": 3, "P2": 4}
 
 #Variables
 
-x = lp.LpVariable.dicts("x", [(p, a) for p in products for a in arcs], lowBound=0, cat="Integer" )
+x = lp.LpVariable.dicts("x", [(p, a) for p in products for a in arcs], lowBound=0, cat="Continuous" )
 
-y = lp.LpVariable.dicts("y", arcs, lowBound=0,upBound=1, cat="Binary")
+y = lp.LpVariable.dicts("y", arcs, lowBound=0, upBound=1, cat="Binary")
 
 #Función objetivo
 
-CF = lp.lpSum(Cf[i] * y[i] for i in arcs)
+CF = lp.lpSum(Cf[a] * y[a] for a in arcs)
 
-CV = lp.lpSum(Cv[i] * x[(i,j)] for i in arcs for j in products)
+CV = lp.lpSum(Cv[a] * x[(p,a)] for p in products for a in arcs )
 
 model += CF + CV
 
 
-#Parámetros
+#Restricciones
+
+
+for p in products:
+    for i in nodes:
+        salida = lp.lpSum(x[(p,a)] for a in arcs if a[0] == i)
+        entrada = lp.lpSum(x[(p,a)] for a in arcs if a[1] == i)
+        
+        if i == Start[p]:
+            balance = 1
+        elif i == End[p]:
+            balance = -1
+        else:
+            balance = 0
+            
+        
+        model += salida - entrada == balance
+
+     # Si y=0 no puede haber flujo
+     
+for (i, j) in arcs:
+    model += lp.lpSum(x[p, (i, j)] for p in products) <= 100 * y[(i, j)]
 
 
 
+#Resolver
+
+model.solve()
+
+print("\n Estado del problema: ", lp.LpStatus[model.status])
+print("\n Objetivo: ", lp.value(model.objective))
+
+
+print("\n Arcos abiertos:")
+for a in arcs:
+    if y[a].varValue > 0.001:
+        print(f"  {a}: abierto ({y[a].varValue})")
+
+print("\n Flujos por producto:")
+for p in products:
+    print(f"Producto {p}:")
+    for a in arcs:
+        val = x[(p, a)].varValue
+        if val and val > 1e-6:
+            print(f"  Flujo {val:.2f} por arco {a}")
 
 
 
