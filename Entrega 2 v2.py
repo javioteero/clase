@@ -86,7 +86,7 @@ print("\n Objetivo: ", lp.value(model.objective))
 print("\n Arcos abiertos:")
 for a in arcs:
     if y[a].varValue > 0.001:
-        print(f"  {a}: abierto ({y[a].varValue})")
+        print(f"  {a}: abierto")
 
 print("\n Flujos por producto:")
 for p in products:
