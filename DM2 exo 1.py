@@ -1,7 +1,8 @@
 import pulp 
 
+
 nodes = [1, 2, 3, 4]
-products = ["P1","P2"]
+products = ["1","2"]
 arcs = [(1, 2), (1, 4), (2, 3), (2, 4), (3, 4)]
 
 
@@ -18,8 +19,8 @@ Cv = { (1, 2): 5,
       (2, 4): 6,
       (3, 4): 5}
 
-Start = {"P1": 1, "P2": 1}
-End = {"P1": 3, "P2": 4}
+Start = {"1": 1, "2": 1}
+End = {"1": 3, "2": 4}
 
 
 model = pulp.LpProblem("Minicost", pulp.LpMinimize)
