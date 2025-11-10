@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sun Nov  9 19:51:52 2025
 
-@author: Javi
-"""
 
 import pulp as lp
 import random
 
-# -----------------------------
+# --------------------------------------------------------
 #         DATOS
-# -----------------------------
+# --------------------------------------------------------
 
 N_nodos = 20
 N_productos = 10
@@ -70,18 +66,18 @@ print("Destinos: ", End)
 
 # y aleatorio
 
-yrand = {}
+ybar = {}
 for i in arcos:
-    yrand[i] = 1 if random.random() < 0.7 else 0
+    ybar[i] = 1 if random.random() < 0.7 else 0
 
-print("|n Valores de yrand: ")
+print("|n Valores de ybar: ")
 for i in arcos:
-    print(f"yrand{i}= {yrand[i]}")
+    print(f"ybar{i}= {ybar[i]}")
 
 
-# ------------------------------
+# --------------------------------------------------------------------------------------------------------
 #  PROBLEMA PRIMAL
-# ------------------------------
+# --------------------------------------------------------------------------------------------------------
 
 primal = lp.LpProblem("Primal", lp.LpMinimize)
 
@@ -112,7 +108,7 @@ for p in productos:
         primal += salida - entrada == balance
 
 for (i, j) in arcos:
-    primal += lp.lpSum(x[p, (i, j)] for p in productos) <= 100 * yrand[(i, j)]
+    primal += lp.lpSum(x[p, (i, j)] for p in productos) <= 100 * ybar[(i, j)]
 
 #Resolver
 
@@ -121,35 +117,53 @@ primal.solve()
 print("\n Estado del problema primal: ", lp.LpStatus[primal.status])
 print("\n Objetivo primal: ", lp.value(primal.objective))
 
-# ------------------------------
+# --------------------------------------------------------------------------------------------------------------
 #  PROBLEMA DUAL
-# ------------------------------
+# --------------------------------------------------------------------------------------------------------------
 
-dual = lp.LpProblem("Dual", lp.lpMaximize)
+dual = lp.LpProblem("Dual", lp.LpMaximize)
 
 
 #Variables
 
 xi = lp.LpVariable.dicts("xi", [(p, i) for p in productos for i in nodos], lowBound=None, cat="Continuous")
 
-yi = lp.lpvariable.dicts([(p, a) for p in productos for a in arcos], lowBound=0, cat="Continuous")
+yi = lp.LpVariable.dicts("yi", [(p, a) for p in productos for a in arcos], lowBound=0, cat="Continuous")
 
 
 #Función objetivo
 
+b = {}
+for p in productos:
+    for i in nodos:
+        if i == Start[p]:
+            b[(p, i)] = 1
+        elif i == End[p]:
+            b[(p, i)] = -1
+        else:
+            b[(p, i)] = 0
+
+
 dual += (
     lp.lpSum(b[(p, i)] * xi[(p, i)] for p in productos for i in nodos) +
-    lp.lpSum(yrand[a] * yi[(p, a)] for p in productos for a in arcos)
+    lp.lpSum(ybar[a] * yi[(p, a)] for p in productos for a in arcos)
 )
 
 
+#Restricción
+
+for p in productos:
+    for (i,j) in arcos:
+        dual += (xi[(p,j)] - xi[(p,j)] + yi[(p, (i,j))]) <= Cv[(i,j)]
 
 
 
+#Resolver
 
+dual.solve()
 
-
-
+print("\n Estado del problema dual: ", lp.LpStatus[primal.status])
+print("\n Objetivo dual: ", lp.value(primal.objective))
 
 
 
