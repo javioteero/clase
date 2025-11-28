@@ -64,8 +64,8 @@ for p in products:
             balance = -1
         else:
             balance = 0
-            
-        
+
+
         model += salida - entrada == balance
 
      # Si y=0 no puede haber flujo
