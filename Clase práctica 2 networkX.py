@@ -76,7 +76,7 @@ if __name__ == "__main__":
     # --- Crear un grafo 
     n = 20 #nodos
     k = 4 #grado
-    p = 0 #grafo tipo anillo
+    p = 3 #grafo tipo anillo
     
     G = nx.watts_strogatz_graph(n=n, k=k, p=p, seed=1)
 
